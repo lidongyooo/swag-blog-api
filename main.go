@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/lidongyooo/swag-blog-api/bootstrap"
 	"github.com/lidongyooo/swag-blog-api/pkg/config"
 	"net/http"
@@ -9,8 +10,12 @@ import (
 )
 
 func main() {
-	bootstrap.SetupDB()
 
+	if !config.Viper.GetBool("APP_DEBUG") {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	bootstrap.SetupDB()
 	r := bootstrap.SetupRoute()
 
 	s := &http.Server{
