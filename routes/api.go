@@ -2,11 +2,11 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/lidongyooo/swag-blog-api/app/models/controllers"
+	controllers2 "github.com/lidongyooo/swag-blog-api/app/controllers"
 )
 
 func RegisterApiRoutes(r *gin.Engine)  {
-	ac := new(controllers.ArticlesController)
+	ac := new(controllers2.ArticlesController)
 	articles := r.Group("/articles")
 	articles.POST("", ac.Store)
 	articles.POST("/:id", ac.Update)
