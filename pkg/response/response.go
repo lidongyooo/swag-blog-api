@@ -46,16 +46,14 @@ func Error(code int, err error) *Errors {
 		errors = make(map[string]string)
 	)
 
-	if _, ok := err.(*validator.InvalidValidationError); ok {
-		msg = err.Error()
-	}else if _, ok := err.(validator.ValidationErrors); ok {
+	if _, ok := err.(validator.ValidationErrors); ok {
 		msg = "The given data was invalid."
 
 		for _, err := range err.(validator.ValidationErrors) {
 			errors[strings.SnakeString(err.Field())] = err.Tag()
 		}
 	} else {
-		msg = "fail"
+		msg = err.Error()
 	}
 
 	return &Errors{

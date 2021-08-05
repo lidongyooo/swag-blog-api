@@ -9,4 +9,6 @@ func RegisterApiRoutes(r *gin.Engine)  {
 	ac := new(controllers.ArticlesController)
 	articles := r.Group("/articles")
 	articles.POST("", ac.Store)
+	articles.POST("/:id", ac.Update)
+
 }
