@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lidongyooo/swag-blog-api/app/models/article"
@@ -8,6 +10,7 @@ import (
 	res "github.com/lidongyooo/swag-blog-api/pkg/response"
 	"github.com/lidongyooo/swag-blog-api/pkg/slices"
 	"gorm.io/gorm"
+	"io/ioutil"
 	"net/http"
 	"strconv"
 	"strings"
@@ -64,6 +67,14 @@ func (articles *ArticlesController) Show (context *gin.Context)  {
 		}
 		return
 	}
+
+	body := map[string]string{"text": _article.Body}
+	jsonBody, _ := json.Marshal(body)
+	resp, err := http.Post("https://api.github.com/markdown", "application/json", bytes.NewBuffer(jsonBody))
+	defer resp.Body.Close()
+
+	respBody, _ := ioutil.ReadAll(resp.Body)
+	_article.Body = string(respBody)
 
 	context.JSON(http.StatusOK, res.New(res.SUCCESS, res.GetMsg(res.SUCCESS)).WithData(_article))
 }
