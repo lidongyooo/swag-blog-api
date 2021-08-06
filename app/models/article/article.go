@@ -2,6 +2,7 @@ package article
 
 import (
 	"github.com/lidongyooo/swag-blog-api/app/models"
+	"github.com/lidongyooo/swag-blog-api/pkg/config"
 	"github.com/lidongyooo/swag-blog-api/pkg/model"
 )
 
@@ -34,6 +35,39 @@ func ArticleUpdate(article Article) (Article, error) {
 	}
 
 	return article, nil
+}
+
+func GetArticlesByTag(tagId uint64, page int) (int64, []Article, error) {
+	var (
+		articles []Article
+		tag Tag
+		count int64
+		pageLimit = config.Viper.GetInt("PAGINATION_LIMIT")
+		pageOffset = (page - 1) * pageLimit
+	)
+
+	if tagId > 0 {
+		model.DB.First(&tag, tagId)
+		count = model.DB.Model(&tag).Association("Articles").Count()
+		if err := model.DB.Model(&tag).Limit(pageLimit).Offset(pageOffset).Association("Articles").Find(&articles); err != nil {
+			return count, articles, err
+		}
+
+		var articleIds []uint64
+		for _, article := range articles {
+			articleIds = append(articleIds, article.Id)
+		}
+		if err := model.DB.Preload("Tags").Where("id IN ?", articleIds).Find(&articles).Error; err != nil {
+			return count, articles, err
+		}
+	} else {
+		model.DB.Model(&articles).Count(&count)
+		if err := model.DB.Preload("Tags").Limit(pageLimit).Offset(pageOffset).Find(&articles).Error; err != nil {
+			return count, articles, err
+		}
+	}
+
+	return count, articles, nil
 }
 
 func Get(id uint64) (Article, error) {

@@ -8,7 +8,8 @@ import (
 func RegisterApiRoutes(r *gin.Engine)  {
 	ac := new(controllers2.ArticlesController)
 	articles := r.Group("/articles")
+	articles.GET("", ac.Index)
 	articles.POST("", ac.Store)
 	articles.POST("/:id", ac.Update)
-
+	articles.GET("/:id", ac.Show)
 }
