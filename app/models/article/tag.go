@@ -13,6 +13,18 @@ type Tag struct {
 	Articles []*Article `gorm:"many2many:article_tags;" json:"articles"`
 }
 
+
+func GetTagsAll() ([]Tag, error) {
+	var tags []Tag
+
+	if err := model.DB.Find(&tags).Error; err != nil {
+		return tags, err
+	}
+
+	return tags, nil
+}
+
+
 func GetTagsByNames(names []string) ([]Tag, error) {
 	var tags []Tag
 
