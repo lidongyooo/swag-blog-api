@@ -57,12 +57,12 @@ func GetArticlesByTag(tagId uint64, page int) (int64, []Article, error) {
 		for _, article := range articles {
 			articleIds = append(articleIds, article.Id)
 		}
-		if err := model.DB.Preload("Tags").Where("id IN ?", articleIds).Order("id DESC").Find(&articles).Error; err != nil {
+		if err := model.DB.Preload("Tags").Select("id, title, created_at, updated_at").Where("id IN ?", articleIds).Order("id DESC").Find(&articles).Error; err != nil {
 			return count, articles, err
 		}
 	} else {
 		model.DB.Model(&articles).Count(&count)
-		if err := model.DB.Preload("Tags").Limit(pageLimit).Offset(pageOffset).Order("id DESC").Find(&articles).Error; err != nil {
+		if err := model.DB.Preload("Tags").Select("id, title, created_at, updated_at").Limit(pageLimit).Offset(pageOffset).Order("id DESC").Find(&articles).Error; err != nil {
 			return count, articles, err
 		}
 	}
