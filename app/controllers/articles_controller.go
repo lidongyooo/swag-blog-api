@@ -72,11 +72,19 @@ func (articles *ArticlesController) Show (context *gin.Context)  {
 	jsonBody, _ := json.Marshal(body)
 	resp, err := http.Post("https://api.github.com/markdown", "application/json", bytes.NewBuffer(jsonBody))
 	defer resp.Body.Close()
-
 	respBody, _ := ioutil.ReadAll(resp.Body)
-	_article.Body = string(respBody)
 
-	context.JSON(http.StatusOK, res.New(res.SUCCESS, res.GetMsg(res.SUCCESS)).WithData(_article))
+
+	type articleExt struct {
+		article.Article
+		BodyHTML string `json:"body_html"`
+	}
+	articleRes := articleExt{
+		Article: _article,
+		BodyHTML: string(respBody),
+	}
+
+	context.JSON(http.StatusOK, res.New(res.SUCCESS, res.GetMsg(res.SUCCESS)).WithData(articleRes))
 }
 
 
